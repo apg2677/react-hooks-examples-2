@@ -1,22 +1,44 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 
-function CountdownTimer({ initialCount }) {
-  const [count, setCount] = useState(initialCount);
+function PaginatedData() {
+  const [page, setPage] = useState(1);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (count === 0) return;
+    setLoading(true);
+    setError(null);
 
-    const timer = setTimeout(() => {
-      setCount(count - 1);
-    }, 1000);
+    fetch(`https://api.example.com/data?page=${page}`)
+      .then((resp) => resp.json())
+      .then((data) => {
+        setData(data.items);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+        console.log(err);
+      });
+  }, [page]);
 
-    return () => clearTimeout(timer);
-  }, [count]);
   return (
     <div>
-      <h2>Countdown: {count}</h2>
-      {count === 0 && <p>Countdown Complete!</p>}
+      <h2>Page: {page}</h2>
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>Error: {error}</p>
+      ) : (
+        <ul>
+          {data.map((item) => (
+            <li key={item.id}>{item.name}</li>
+          ))}
+        </ul>
+      )}
+      <button onClick={() => setPage(page + 1)}>Next Page</button>
     </div>
   );
 }
@@ -24,7 +46,7 @@ function CountdownTimer({ initialCount }) {
 function App() {
   return (
     <div>
-      <CountdownTimer initialCount={10} />
+      <PaginatedData />
     </div>
   );
 }
