@@ -1,36 +1,46 @@
 import "./App.css";
 import { useEffect, useState, useContext, createContext } from "react";
 
-const ThemeContext = createContext();
+const AuthContext = createContext();
 
 function App() {
-  const [theme, setTheme] = useState("light");
+  const [user, setUser] = useState(null);
 
-  const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  const login = (username) => {
+    setUser({ name: username });
+  };
+  const logout = () => {
+    setUser(null);
   };
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <Toolbar />
-    </ThemeContext.Provider>
+    <AuthContext.Provider value={{ user, login, logout }}>
+      <Navbar />
+      <MainContent />
+    </AuthContext.Provider>
   );
 }
 
-function Toolbar() {
+function Navbar() {
+  const { user, logout } = useContext(AuthContext);
+
   return (
-    <div>
-      <h1>Toolbar</h1>
-      <ToggleTheme />
-    </div>
+    <nav>
+      <p>{user ? `Welcome, ${user.name}` : "Not logged in"}</p>
+      {user && <button onClick={logout}>Logout</button>}
+    </nav>
   );
 }
 
-function ToggleTheme() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+function MainContent() {
+  const { user, login } = useContext(AuthContext);
+
   return (
     <div>
-      <p>Theme: {theme}</p>
-      <button onClick={toggleTheme}>Toggle Theme</button>
+      {user ? (
+        <p>Hello, {user.name}! enjoy</p>
+      ) : (
+        <button onClick={() => login("JohnDoe")}>Login</button>
+      )}
     </div>
   );
 }
