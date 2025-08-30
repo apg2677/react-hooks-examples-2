@@ -1,22 +1,22 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 
-function ConditionEffectComponent() {
-  const [count, setCount] = useState(0);
-  const [message, setMessage] = useState("");
+function CountdownTimer({ initialCount }) {
+  const [count, setCount] = useState(initialCount);
 
   useEffect(() => {
-    if (count > 5) {
-      setMessage("Count is greater than 5");
-    } else {
-      setMessage("");
-    }
+    if (count === 0) return;
+
+    const timer = setTimeout(() => {
+      setCount(count - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
   }, [count]);
   return (
     <div>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-      {message && <p>Message: {message}</p>}
+      <h2>Countdown: {count}</h2>
+      {count === 0 && <p>Countdown Complete!</p>}
     </div>
   );
 }
@@ -24,7 +24,7 @@ function ConditionEffectComponent() {
 function App() {
   return (
     <div>
-      <ConditionEffectComponent />
+      <CountdownTimer initialCount={10} />
     </div>
   );
 }
