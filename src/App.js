@@ -1,44 +1,30 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 
-function UserProfile({ userId }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+function ConditionEffectComponent() {
+  const [count, setCount] = useState(0);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-
-    fetch(`https://api.example.com/users/${userId}`)
-      .then((resp) => resp.json())
-      .then((data) => {
-        setUser(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
-        setLoading(false);
-      });
-  }, [userId]);
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-  if (error) {
-    return <p>Error: {error.message}</p>;
-  }
+    if (count > 5) {
+      setMessage("Count is greater than 5");
+    } else {
+      setMessage("");
+    }
+  }, [count]);
   return (
     <div>
-      <h2>{user.name}</h2>
-      <p>Email: {user.email}</p>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+      {message && <p>Message: {message}</p>}
     </div>
   );
 }
+
 function App() {
   return (
     <div>
-      <UserProfile userId={userId} />
+      <ConditionEffectComponent />
     </div>
   );
 }
