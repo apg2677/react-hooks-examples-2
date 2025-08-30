@@ -1,25 +1,44 @@
 import "./App.css";
-
 import { useEffect, useState } from "react";
 
-function App() {
-  const [name, setName] = useState(() => {
-    return localStorage.getItem("name") || "";
-  });
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem("name", name);
-  }, [name]);
+    setLoading(true);
+    setError(null);
 
+    fetch(`https://api.example.com/users/${userId}`)
+      .then((resp) => resp.json())
+      .then((data) => {
+        setUser(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err);
+        setLoading(false);
+      });
+  }, [userId]);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+  if (error) {
+    return <p>Error: {error.message}</p>;
+  }
   return (
     <div>
-      <h2>Enter your name: </h2>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <h3>Name: {name} </h3>
+      <h2>{user.name}</h2>
+      <p>Email: {user.email}</p>
+    </div>
+  );
+}
+function App() {
+  return (
+    <div>
+      <UserProfile userId={userId} />
     </div>
   );
 }
