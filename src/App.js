@@ -1,41 +1,36 @@
 import "./App.css";
 import { useEffect, useState, useContext, createContext } from "react";
 
-const UserContext = createContext();
+const ThemeContext = createContext();
 
 function App() {
-  const [user, setUser] = useState({ name: "John" });
+  const [theme, setTheme] = useState("light");
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  };
   return (
-    <UserContext.Provider value={user}>
-      <Dashboard />
-    </UserContext.Provider>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      <Toolbar />
+    </ThemeContext.Provider>
   );
 }
 
-function Dashboard() {
+function Toolbar() {
   return (
     <div>
-      <h1>Dashboard</h1>
-      <Sidebar />
+      <h1>Toolbar</h1>
+      <ToggleTheme />
     </div>
   );
 }
 
-function Sidebar() {
+function ToggleTheme() {
+  const { theme, toggleTheme } = useContext(ThemeContext);
   return (
     <div>
-      <h2>Sidebar</h2>
-      <Profile />
-    </div>
-  );
-}
-
-function Profile() {
-  const user = useContext(UserContext);
-  return (
-    <div>
-      <h2>Profile</h2>
-      <p>User Name: {user.name} </p>
+      <p>Theme: {theme}</p>
+      <button onClick={toggleTheme}>Toggle Theme</button>
     </div>
   );
 }
