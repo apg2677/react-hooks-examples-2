@@ -1,47 +1,27 @@
 import "./App.css";
 import { useEffect, useState, useContext, createContext } from "react";
 
-const AuthContext = createContext();
+const LanguageContext = createContext();
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [language, setLanguage] = useState('en')
 
-  const login = (username) => {
-    setUser({ name: username });
-  };
-  const logout = () => {
-    setUser(null);
-  };
+  const changeLanguage = (lang) => {
+    setLanguage(lang)
+  }
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      <Navbar />
-      <MainContent />
-    </AuthContext.Provider>
+    
   );
 }
 
-function Navbar() {
-  const { user, logout } = useContext(AuthContext);
-
+function Header() {
   return (
-    <nav>
-      <p>{user ? `Welcome, ${user.name}` : "Not logged in"}</p>
-      {user && <button onClick={logout}>Logout</button>}
-    </nav>
-  );
+    <header>
+      <h1>{language === 'en'? 'Hello': 'Hola'}</h1>
+      <button onClick={changeLanguage}>English</button>
+      <button onClick={changeLanguage}>Spanish</button>
+    </header>
+  )
 }
 
-function MainContent() {
-  const { user, login } = useContext(AuthContext);
-
-  return (
-    <div>
-      {user ? (
-        <p>Hello, {user.name}! enjoy</p>
-      ) : (
-        <button onClick={() => login("JohnDoe")}>Login</button>
-      )}
-    </div>
-  );
-}
 export default App;
