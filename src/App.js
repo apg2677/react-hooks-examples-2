@@ -1,57 +1,54 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { useReducer, useState } from "react";
 import "./App.css";
+function reducer(state, action) {
+  switch (action.type) {
+    case "add":
+      return [
+        ...state,
+        { id: Date.now(), text: action.text, completed: false },
+      ];
+    case "toggle":
+      return state.map((todo) =>
+        todo.id === action.id ? { ...todo, completed: !todo.completed } : todo,
+      );
 
-const ThemeContext = createContext();
-const AuthContext = createContext();
-
-function App() {
-  const [theme, setTheme] = useState("light");
-  const [user, setUser] = useState(null);
-
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
-      <AuthContext.Provider value={{ user, setUser }}>
-        <Main />
-      </AuthContext.Provider>
-    </ThemeContext.Provider>
-  );
+    case "delete":
+      return state.filter((todo) => todo.id !== action.id);
+    default:
+      return state;
+  }
 }
 
-function Main() {
-  const { theme } = useContext(ThemeContext);
-  const { user } = useContext(AuthContext);
+function App() {
+  const [todos, dispatch] = useReducer(reducer, []);
+  const [text, setText] = useState("");
 
   return (
-    <div
-      style={{
-        backgroundColor: theme === "light" ? "white" : "black",
-        color: theme === "light" ? "black" : "white",
-      }}
-    >
-      <h1>{user ? `Hello ${user.name}` : "Welcome!"}</h1>
-      <ThemeToggle />
-      <LoginButton />
+    <div>
+      <input
+        type="text"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
+      <button onClick={() => dispatch({ type: "add", text })}>Add</button>
+      <ul>
+        {todos.map((todo) => (
+          <li
+            key={todo.id}
+            style={{ textDecoration: todo.completed ? "line-through" : "none" }}
+          >
+            {todo.text}
+            <button onClick={() => dispatch({ type: "toggle", id: todo.id })}>
+              Toggle
+            </button>
+            <button onClick={() => dispatch({ type: "delete", id: todo.id })}>
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
-function ThemeToggle() {
-  const { theme, setTheme } = useContext(ThemeContext);
-
-  return (
-    <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
-      Toggle Theme
-    </button>
-  );
-}
-
-function LoginButton() {
-  const { user, setUser } = useContext(AuthContext);
-
-  return user ? (
-    <button onClick={() => setUser(null)}>Logout</button>
-  ) : (
-    <button onClick={() => setUser({ name: "John" })}>Login</button>
-  );
-}
 export default App;
