@@ -1,55 +1,57 @@
+import React, { createContext, useContext, useState } from "react";
 import "./App.css";
-import { useEffect, useState, useContext, createContext } from "react";
 
-const CartContext = createContext();
+const ThemeContext = createContext();
+const AuthContext = createContext();
 
 function App() {
-  const [cart, setCart] = useState([]);
-
-  const addToCart = (item) => {
-    setCart((prevCart) => [...prevCart, item]);
-  };
-
-  const removeFromCart = (item) => {
-    setCart((prevCart) => prevCart.filter((i) => i !== item));
-  };
+  const [theme, setTheme] = useState("light");
+  const [user, setUser] = useState(null);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
-      <ProductList />
-      <ShoppingCart />
-    </CartContext.Provider>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <AuthContext.Provider value={{ user, setUser }}>
+        <Main />
+      </AuthContext.Provider>
+    </ThemeContext.Provider>
   );
 }
 
-function ProductList() {
-  const { addToCart } = useContext(CartContext);
+function Main() {
+  const { theme } = useContext(ThemeContext);
+  const { user } = useContext(AuthContext);
+
   return (
-    <div>
-      <h2>Products</h2>
-      <button onClick={() => addToCart("Product 1")}>Add Product 1</button>
-      <button onClick={() => addToCart("Product 2")}>Add Product 2</button>
-      <button onClick={() => addToCart("Product 3")}>Add Product 3</button>
+    <div
+      style={{
+        backgroundColor: theme === "light" ? "white" : "black",
+        color: theme === "light" ? "black" : "white",
+      }}
+    >
+      <h1>{user ? `Hello ${user.name}` : "Welcome!"}</h1>
+      <ThemeToggle />
+      <LoginButton />
     </div>
   );
 }
 
-function ShoppingCart() {
-  const { cart, removeFromCart } = useContext(CartContext);
+function ThemeToggle() {
+  const { theme, setTheme } = useContext(ThemeContext);
 
   return (
-    <div>
-      <h2>Shopping Cart</h2>
-      <ul>
-        {cart.map((item, index) => (
-          <li key={index}>
-            {item}{" "}
-            <button onClick={() => removeFromCart(item)}>Remove Item</button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+      Toggle Theme
+    </button>
   );
 }
 
+function LoginButton() {
+  const { user, setUser } = useContext(AuthContext);
+
+  return user ? (
+    <button onClick={() => setUser(null)}>Logout</button>
+  ) : (
+    <button onClick={() => setUser({ name: "John" })}>Login</button>
+  );
+}
 export default App;
