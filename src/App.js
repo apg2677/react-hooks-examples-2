@@ -1,79 +1,26 @@
 import React, { useReducer } from "react";
 
-function formReducer(state, action) {
+function themeReducer(state, action) {
   switch (action.type) {
-    case "updateField":
-      return { ...state, [action.field]: action.value };
-    case "reset":
-      return action.initialState;
+    case "toggle":
+      return state === "light" ? "dark" : "light";
     default:
-      throw new Error("Unkown action type");
+      throw new Error("Unknown Action");
   }
 }
 
 function App() {
-  const initialState = { name: "", email: "", password: "" };
-  const [state, dispatch] = useReducer(formReducer, initialState);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form Submitted:", state);
-  };
+  const [theme, dispatch] = useReducer(themeReducer, "light");
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Name:
-        <input
-          type="text"
-          value={state.name}
-          onChange={(e) =>
-            dispatch({
-              type: "updateField",
-              field: "name",
-              value: e.target.value,
-            })
-          }
-        />
-      </label>
-      <br />
-      <label>
-        Email:
-        <input
-          type="text"
-          value={state.email}
-          onChange={(e) =>
-            dispatch({
-              type: "updateField",
-              field: "email",
-              value: e.target.value,
-            })
-          }
-        />
-      </label>
-      <br />
-      <label>
-        Password:
-        <input
-          type="password"
-          value={state.password}
-          onChange={(e) =>
-            dispatch({
-              type: "updateField",
-              field: "password",
-              value: e.target.value,
-            })
-          }
-        />
-      </label>
-      <br />
-      <button type="submit">Submit Form</button>
-      <button
-        onClick={() => dispatch({ type: "reset", initialState })}
-        type="button"
-      >
-        Reset
-      </button>
-    </form>
+    <div
+      style={{
+        background: theme === "light" ? "white" : "darkgray",
+        color: theme === "light" ? "black" : "white",
+      }}
+    >
+      <h1>Theme: {theme}</h1>
+      <button onClick={() => dispatch({ type: "toggle" })}>Toggle Theme</button>
+    </div>
   );
 }
 
