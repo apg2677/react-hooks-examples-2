@@ -1,53 +1,79 @@
-import React, { useReducer, useState } from "react";
-import "./App.css";
-function reducer(state, action) {
-  switch (action.type) {
-    case "add":
-      return [
-        ...state,
-        { id: Date.now(), text: action.text, completed: false },
-      ];
-    case "toggle":
-      return state.map((todo) =>
-        todo.id === action.id ? { ...todo, completed: !todo.completed } : todo,
-      );
+import React, { useReducer } from "react";
 
-    case "delete":
-      return state.filter((todo) => todo.id !== action.id);
+function formReducer(state, action) {
+  switch (action.type) {
+    case "updateField":
+      return { ...state, [action.field]: action.value };
+    case "reset":
+      return action.initialState;
     default:
-      return state;
+      throw new Error("Unkown action type");
   }
 }
 
 function App() {
-  const [todos, dispatch] = useReducer(reducer, []);
-  const [text, setText] = useState("");
+  const initialState = { name: "", email: "", password: "" };
+  const [state, dispatch] = useReducer(formReducer, initialState);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form Submitted:", state);
+  };
   return (
-    <div>
-      <input
-        type="text"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-      <button onClick={() => dispatch({ type: "add", text })}>Add</button>
-      <ul>
-        {todos.map((todo) => (
-          <li
-            key={todo.id}
-            style={{ textDecoration: todo.completed ? "line-through" : "none" }}
-          >
-            {todo.text}
-            <button onClick={() => dispatch({ type: "toggle", id: todo.id })}>
-              Toggle
-            </button>
-            <button onClick={() => dispatch({ type: "delete", id: todo.id })}>
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <label>
+        Name:
+        <input
+          type="text"
+          value={state.name}
+          onChange={(e) =>
+            dispatch({
+              type: "updateField",
+              field: "name",
+              value: e.target.value,
+            })
+          }
+        />
+      </label>
+      <br />
+      <label>
+        Email:
+        <input
+          type="text"
+          value={state.email}
+          onChange={(e) =>
+            dispatch({
+              type: "updateField",
+              field: "email",
+              value: e.target.value,
+            })
+          }
+        />
+      </label>
+      <br />
+      <label>
+        Password:
+        <input
+          type="password"
+          value={state.password}
+          onChange={(e) =>
+            dispatch({
+              type: "updateField",
+              field: "password",
+              value: e.target.value,
+            })
+          }
+        />
+      </label>
+      <br />
+      <button type="submit">Submit Form</button>
+      <button
+        onClick={() => dispatch({ type: "reset", initialState })}
+        type="button"
+      >
+        Reset
+      </button>
+    </form>
   );
 }
 
