@@ -1,25 +1,42 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useState } from "react";
 
-function themeReducer(state, action) {
+function accountReducer(state, action) {
   switch (action.type) {
-    case "toggle":
-      return state === "light" ? "dark" : "light";
+    case "deposit":
+      return { ...state, balance: state.balance + action.amount };
+    case "withdraw":
+      return { ...state, balance: state.balance - action.amount };
+    case "reset":
+      return { balance: 0 };
     default:
       throw new Error("Unknown Action");
   }
 }
 
 function App() {
-  const [theme, dispatch] = useReducer(themeReducer, "light");
+  const [state, dispatch] = useReducer(accountReducer, { balance: 0 });
+  const [inputAmount, setInputAmount] = useState(0);
   return (
-    <div
-      style={{
-        background: theme === "light" ? "white" : "darkgray",
-        color: theme === "light" ? "black" : "white",
-      }}
-    >
-      <h1>Theme: {theme}</h1>
-      <button onClick={() => dispatch({ type: "toggle" })}>Toggle Theme</button>
+    <div>
+      <h1>Bank Account</h1>
+      <p>Balance: ${state.balance}</p>
+      <label>Amount:</label>
+      <input
+        type="number"
+        value={inputAmount}
+        onChange={(e) => setInputAmount(e.target.value)}
+      />
+      <button
+        onClick={() => dispatch({ type: "deposit", amount: +inputAmount })}
+      >
+        Deposit
+      </button>
+      <button
+        onClick={() => dispatch({ type: "withdraw", amount: +inputAmount })}
+      >
+        Withdraw
+      </button>
+      <button onClick={() => dispatch({ type: "reset" })}>Reset</button>
     </div>
   );
 }
