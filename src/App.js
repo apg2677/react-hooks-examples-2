@@ -1,32 +1,41 @@
 import React, { useReducer } from "react";
 
-function accordianReducer(state, action) {
+function stepReducer(state, action) {
   switch (action.type) {
-    case "toggle":
-      return state === action.id ? null : action.id;
+    case "next":
+      return { ...state, step: Math.min(state.step + 1, state.totalSteps) };
+    case "prev":
+      return { ...state, step: Math.max(state.step - 1, 1) };
+    case "reset":
+      return { ...state, step: 1 };
     default:
-      throw new Error("Unknown Action!");
+      throw new Error("Uknown Action!");
   }
 }
 
 function App() {
-  const [openSection, dispatch] = useReducer(accordianReducer, null);
-  const sections = [
-    { id: 1, title: "Section 1", content: "Content 1" },
-    { id: 2, title: "Section 2", content: "Content 2" },
-    { id: 3, title: "Section 3", content: "Content 3" },
-  ];
+  const initialState = { step: 1, totalSteps: 3 };
+  const [state, dispatch] = useReducer(stepReducer, initialState);
 
   return (
     <div>
-      {sections.map((section) => (
-        <div key={section.id}>
-          <h3 onClick={() => dispatch({ type: "toggle", id: section.id })}>
-            {section.title}
-          </h3>{" "}
-          {openSection === section.id && <p>{section.content}</p>}
-        </div>
-      ))}
+      <h1>
+        Step {state.step} of {state.totalSteps}
+      </h1>
+      <button
+        disabled={state.step === 1}
+        onClick={() => dispatch({ type: "prev" })}
+      >
+        Decrease Step
+      </button>
+      <button
+        disabled={state.step === state.totalSteps}
+        onClick={() => dispatch({ type: "next" })}
+      >
+        Increase Step
+      </button>
+
+      <button onClick={() => dispatch({ type: "reset" })}>Reset</button>
     </div>
   );
 }
