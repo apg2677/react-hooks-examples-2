@@ -1,42 +1,32 @@
-import React, { useReducer, useState } from "react";
+import React, { useReducer } from "react";
 
-function accountReducer(state, action) {
+function accordianReducer(state, action) {
   switch (action.type) {
-    case "deposit":
-      return { ...state, balance: state.balance + action.amount };
-    case "withdraw":
-      return { ...state, balance: state.balance - action.amount };
-    case "reset":
-      return { balance: 0 };
+    case "toggle":
+      return state === action.id ? null : action.id;
     default:
-      throw new Error("Unknown Action");
+      throw new Error("Unknown Action!");
   }
 }
 
 function App() {
-  const [state, dispatch] = useReducer(accountReducer, { balance: 0 });
-  const [inputAmount, setInputAmount] = useState(0);
+  const [openSection, dispatch] = useReducer(accordianReducer, null);
+  const sections = [
+    { id: 1, title: "Section 1", content: "Content 1" },
+    { id: 2, title: "Section 2", content: "Content 2" },
+    { id: 3, title: "Section 3", content: "Content 3" },
+  ];
+
   return (
     <div>
-      <h1>Bank Account</h1>
-      <p>Balance: ${state.balance}</p>
-      <label>Amount:</label>
-      <input
-        type="number"
-        value={inputAmount}
-        onChange={(e) => setInputAmount(e.target.value)}
-      />
-      <button
-        onClick={() => dispatch({ type: "deposit", amount: +inputAmount })}
-      >
-        Deposit
-      </button>
-      <button
-        onClick={() => dispatch({ type: "withdraw", amount: +inputAmount })}
-      >
-        Withdraw
-      </button>
-      <button onClick={() => dispatch({ type: "reset" })}>Reset</button>
+      {sections.map((section) => (
+        <div key={section.id}>
+          <h3 onClick={() => dispatch({ type: "toggle", id: section.id })}>
+            {section.title}
+          </h3>{" "}
+          {openSection === section.id && <p>{section.content}</p>}
+        </div>
+      ))}
     </div>
   );
 }
