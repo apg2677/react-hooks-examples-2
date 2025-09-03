@@ -1,52 +1,41 @@
-import React, { useReducer, useState } from "react";
-import "./App.css";
-function reducer(state, action) {
-  switch (action.type) {
-    case "add":
-      return [
-        ...state,
-        { id: Date.now(), text: action.text, completed: false },
-      ];
-    case "toggle":
-      return state.map((todo) =>
-        todo.id === action.id ? { ...todo, completed: !todo.completed } : todo,
-      );
+import React, { useReducer } from "react";
 
-    case "delete":
-      return state.filter((todo) => todo.id !== action.id);
+function stepReducer(state, action) {
+  switch (action.type) {
+    case "next":
+      return { ...state, step: Math.min(state.step + 1, state.totalSteps) };
+    case "prev":
+      return { ...state, step: Math.max(state.step - 1, 1) };
+    case "reset":
+      return { ...state, step: 1 };
     default:
-      return state;
+      throw new Error("Uknown Action!");
   }
 }
 
 function App() {
-  const [todos, dispatch] = useReducer(reducer, []);
-  const [text, setText] = useState("");
+  const initialState = { step: 1, totalSteps: 3 };
+  const [state, dispatch] = useReducer(stepReducer, initialState);
 
   return (
     <div>
-      <input
-        type="text"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-      <button onClick={() => dispatch({ type: "add", text })}>Add</button>
-      <ul>
-        {todos.map((todo) => (
-          <li
-            key={todo.id}
-            style={{ textDecoration: todo.completed ? "line-through" : "none" }}
-          >
-            {todo.text}
-            <button onClick={() => dispatch({ type: "toggle", id: todo.id })}>
-              Toggle
-            </button>
-            <button onClick={() => dispatch({ type: "delete", id: todo.id })}>
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
+      <h1>
+        Step {state.step} of {state.totalSteps}
+      </h1>
+      <button
+        disabled={state.step === 1}
+        onClick={() => dispatch({ type: "prev" })}
+      >
+        Decrease Step
+      </button>
+      <button
+        disabled={state.step === state.totalSteps}
+        onClick={() => dispatch({ type: "next" })}
+      >
+        Increase Step
+      </button>
+
+      <button onClick={() => dispatch({ type: "reset" })}>Reset</button>
     </div>
   );
 }
